@@ -1,0 +1,48 @@
+#omc-order-manager-control .omc-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    color: #425466;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+#omc-order-manager-control .omc-badge--self {
+    border-color: #a7d8b0;
+    background-color: #edf9f0;
+    color: #2f6b3c;
+    box-shadow: inset 0 0 0 1px rgba(61, 167, 90, 0.12);
+}
+
+#omc-order-manager-control .omc-badge--busy {
+    border-color: #f1b44c;
+    background-color: #fff4de;
+    color: #7a3e00;
+    box-shadow: inset 0 0 0 1px rgba(255, 193, 7, 0.2);
+}
+
+#omc-order-manager-control .omc-badge__icon {
+    flex: 0 0 auto;
+    width: 20px;
+    height: 20px;
+}
+
+#omc-order-manager-control .omc-badge--self .omc-badge__icon {
+    color: #2f9e44;
+}
+
+#omc-order-manager-control .omc-badge--busy .omc-badge__icon {
+    color: #d97706;
+}
+
+#omc-order-manager-control .omc-badge__text {
+    display: inline-block;
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

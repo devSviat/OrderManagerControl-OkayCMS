@@ -1,0 +1,22 @@
+{
+  "Okay": "4.5.2",
+  "version": "1.0.0",
+  "moduleName": "Order Manager Control",
+  "vendor": {
+    "email": "devsviat@proton.me",
+    "site": "https://github.com/devSviat"
+  },
+  "modifications": {
+    "backend": [
+      {
+        "file": "order.tpl",
+        "changes": [
+          {
+            "find": "<div class=\"box_btn_heading ml-h hidden-xs-down order_toolbar__markers\">",
+            "appendAfter": "order_manager_control.tpl"
+          }
+        ]
+      }
+    ]
+  }
+}
