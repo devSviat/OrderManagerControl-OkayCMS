@@ -9,7 +9,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 require_once __DIR__ . '/Support/ModuleTestCase.php';
 
-use Support\ModuleTestCase;
+use Modules\Sviat\OrderManagerControl\Support\ModuleTestCase;
 
 /**
  * Позначка «цю картку зараз відкрив менеджер X». Показується іншим менеджерам,
