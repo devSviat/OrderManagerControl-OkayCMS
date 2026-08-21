@@ -71,6 +71,13 @@
                 }).done(function (response) {
                     if (response && response.success) {
                         renderManagers(response.managers || []);
+                        return;
+                    }
+                    // Стокова на протухлий токен віддає 200 і пише в лог, тож
+                    // .fail() там не настане — зупиняємось за прапорцем.
+                    if (response && response.expired) {
+                        stopPinging();
+                        document.removeEventListener('visibilitychange', handleVisibilityChange);
                     }
                 }).fail(function (xhr) {
                     // Сесія адмінки скінчилась (або менеджер вийшов у сусідній
