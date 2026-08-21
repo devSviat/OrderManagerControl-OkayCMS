@@ -1,12 +1,10 @@
 {if !empty($order->id)}
-    {$omc_managers_count = $order->omc_active_managers|@count}
-    {$omc_is_busy = $omc_managers_count > 1}
     <div class="ml-h hidden-xs-down order_toolbar__managers" id="omc-order-manager-control" data-order-id="{$order->id|escape}" data-current-manager-id="{$manager->id|escape}">
-        <span class="omc-badge {if $omc_is_busy}omc-badge--busy{else}omc-badge--self{/if} fn_omc_badge">
+        <span class="omc-badge {if $order->omc_is_busy}omc-badge--busy{else}omc-badge--self{/if} fn_omc_badge">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="omc-badge__icon icon icon-tabler icons-tabler-outline icon-tabler-headset"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M4 14v-3a8 8 0 1 1 16 0v3" /><path d="M18 19c0 1.657 -2.686 3 -6 3" /><path d="M4 14a2 2 0 0 1 2 -2h1a2 2 0 0 1 2 2v3a2 2 0 0 1 -2 2h-1a2 2 0 0 1 -2 -2v-3" /><path d="M15 14a2 2 0 0 1 2 -2h1a2 2 0 0 1 2 2v3a2 2 0 0 1 -2 2h-1a2 2 0 0 1 -2 -2v-3" /></svg>
             <span class="fn_omc_managers_text omc-badge__text">
-                {if !empty($order->omc_active_managers)}
-                    {join($order->omc_active_managers, ', ')|escape}
+                {if !empty($order->omc_active_managers_text)}
+                    {$order->omc_active_managers_text|escape}
                 {else}
                     —
                 {/if}
@@ -73,6 +71,31 @@
                 }).done(function (response) {
                     if (response && response.success) {
                         renderManagers(response.managers || []);
+                        return;
+                    }
+                    // Стокова на протухлий токен віддає 200 і пише в лог, тож
+                    // .fail() там не настане — зупиняємось за прапорцем.
+                    if (response && response.expired) {
+                        stopPinging();
+                        document.removeEventListener('visibilitychange', handleVisibilityChange);
+                    }
+                }).fail(function (xhr, textStatus) {
+                    // Сесія скінчилась - на цій сторінці вже ніщо не оживе,
+                    // тож пінгувати далі означає лише засипати лог рядками
+                    // "Session expired" кожні тридцять секунд.
+                    //
+                    // Найчастіший вигляд цього - НЕ 403: ядро редіректить
+                    // аноніма на форму входу (302), jQuery прозоро йде за
+                    // редіректом і отримує 200 з HTML, тобто parsererror при
+                    // dataType: 'json'. 401/403 лишаються для випадку, коли
+                    // менеджер залогінений, а токен сторінки застарів.
+                    //
+                    // Мережевих збоїв тут навмисно немає: xhr.status === 0 це
+                    // таймаут, обрив чи миттєвий офлайн, і глушити через них
+                    // бадж назавжди - гірше за пропущений пінг.
+                    if (textStatus === 'parsererror' || (xhr && (xhr.status === 401 || xhr.status === 403))) {
+                        stopPinging();
+                        document.removeEventListener('visibilitychange', handleVisibilityChange);
                     }
                 }).always(function () {
                     inFlight = null;

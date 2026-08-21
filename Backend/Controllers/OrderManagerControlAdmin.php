@@ -16,6 +16,24 @@ class OrderManagerControlAdmin extends IndexAdmin
 
     public function ping(OrderManagerControlHelper $helper): void
     {
+        // Токен сторінки протух — сесія змінилась, відколи її відрендерили.
+        // Форк такий POST відхиляє ще до контролера (403), а стокова перевіряє
+        // вже ПІСЛЯ його роботи й лише пише в лог `Session expired`, віддаючи
+        // 200. Тобто без цієї гілки клієнт на стоку відмови не бачить і б'є
+        // далі, засипаючи лог. Очікуване значення обидва рушії тримають в
+        // $_SESSION['id'] — у форку це CSRF-токен, у стоковій ідентифікатор
+        // сесії, — тож порівняння однакове.
+        $sentToken = (string) $this->request->post('session_id');
+        $expectedToken = isset($_SESSION['id']) ? (string) $_SESSION['id'] : '';
+
+        if ($expectedToken === '' || !hash_equals($expectedToken, $sentToken)) {
+            $this->response->setContent(
+                json_encode(['success' => false, 'expired' => true]),
+                RESPONSE_JSON
+            );
+            return;
+        }
+
         $orderId = (int) $this->request->post('order_id', 'integer');
         $managerId = !empty($this->manager->id) ? (int) $this->manager->id : 0;
 
