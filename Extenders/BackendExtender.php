@@ -39,10 +39,17 @@ class BackendExtender implements ExtensionInterface
         }
 
         $managers = $this->helper->getActiveManagers($orderId);
-        $order->omc_active_managers = array_values(array_map(
+        $logins = array_values(array_map(
             static fn(array $m): string => (string) $m['login'],
             $managers
         ));
+
+        // Готовий рядок і прапорець, а не масив для обчислень у шаблоні:
+        // Smarty 3 стокової звіряє кожну функцію в шаблоні з політикою
+        // безпеки, і картка замовлення падала на join() фаталом.
+        $order->omc_active_managers = $logins;
+        $order->omc_active_managers_text = implode(', ', $logins);
+        $order->omc_is_busy = count($logins) > 1;
 
         return $order;
     }
