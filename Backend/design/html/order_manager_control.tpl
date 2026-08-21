@@ -79,12 +79,21 @@
                         stopPinging();
                         document.removeEventListener('visibilitychange', handleVisibilityChange);
                     }
-                }).fail(function (xhr) {
-                    // Сесія адмінки скінчилась (або менеджер вийшов у сусідній
-                    // вкладці) - токен на цій сторінці вже ніколи не підійде.
-                    // Без зупинки вкладка, лишена відкритою, б'є кожні 30 секунд
-                    // і кожен удар лягає в лог як "Session expired".
-                    if (!xhr || xhr.status === 0 || xhr.status === 401 || xhr.status === 403) {
+                }).fail(function (xhr, textStatus) {
+                    // Сесія скінчилась - на цій сторінці вже ніщо не оживе,
+                    // тож пінгувати далі означає лише засипати лог рядками
+                    // "Session expired" кожні тридцять секунд.
+                    //
+                    // Найчастіший вигляд цього - НЕ 403: ядро редіректить
+                    // аноніма на форму входу (302), jQuery прозоро йде за
+                    // редіректом і отримує 200 з HTML, тобто parsererror при
+                    // dataType: 'json'. 401/403 лишаються для випадку, коли
+                    // менеджер залогінений, а токен сторінки застарів.
+                    //
+                    // Мережевих збоїв тут навмисно немає: xhr.status === 0 це
+                    // таймаут, обрив чи миттєвий офлайн, і глушити через них
+                    // бадж назавжди - гірше за пропущений пінг.
+                    if (textStatus === 'parsererror' || (xhr && (xhr.status === 401 || xhr.status === 403))) {
                         stopPinging();
                         document.removeEventListener('visibilitychange', handleVisibilityChange);
                     }
