@@ -74,7 +74,7 @@ class OrderManagerControlHelper
                 'manager_login' => $managerLogin,
                 'updated_at' => $now,
             ]);
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             $existing = $entity->findOne([
                 'order_id' => $orderId,
                 'manager_id' => $managerId,

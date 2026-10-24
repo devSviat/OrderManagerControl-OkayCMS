@@ -18,14 +18,14 @@ class Init extends AbstractInit
     {
         $this->setBackendMainController('OrderManagerControlAdmin');
 
-        $managerIdField = (new EntityField('manager_id'))->setTypeInt(11, false);
+        $managerIdField = new EntityField('manager_id')->setTypeInt(11, false);
 
         $this->migrateEntityTable(OrderManagerControlEntity::class, [
-            (new EntityField('id'))->setIndexPrimaryKey()->setTypeInt(11, false)->setAutoIncrement(),
-            (new EntityField('order_id'))->setTypeInt(11, false)->setIndexUnique(null, $managerIdField),
+            new EntityField('id')->setIndexPrimaryKey()->setTypeInt(11, false)->setAutoIncrement(),
+            new EntityField('order_id')->setTypeInt(11, false)->setIndexUnique(null, $managerIdField),
             $managerIdField,
-            (new EntityField('manager_login'))->setTypeVarchar(64, false)->setDefault(''),
-            (new EntityField('updated_at'))->setTypeDatetime(false)->setIndex(),
+            new EntityField('manager_login')->setTypeVarchar(64, false)->setDefault(''),
+            new EntityField('updated_at')->setTypeDatetime(false)->setIndex(),
         ]);
     }
 
@@ -40,7 +40,7 @@ class Init extends AbstractInit
         );
 
         $this->registerSchedule(
-            (new Schedule([OrderManagerControlHelper::class, 'cleanupStale']))
+            new Schedule([OrderManagerControlHelper::class, 'cleanupStale'])
                 ->name('OrderManagerControl: cleanup stale presence rows')
                 ->time('*/5 * * * *')
                 ->overlap(false)
