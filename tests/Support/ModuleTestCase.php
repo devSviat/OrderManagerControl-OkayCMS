@@ -49,8 +49,7 @@ abstract class ModuleTestCase extends TestCase
      *
      * 1. Мокати можна ЛИШЕ перелічені методи: Entity::$selectFields — приватне
      *    поле без значення за замовчуванням, тож на моці без конструктора
-     *    справжній setSelectFields() падає на array_merge(null, ...). Описано в
-     *    tests/Modules/Broken/StockSync/StockSyncTestCase.php.
+     *    справжній setSelectFields() падає на array_merge(null, ...).
      *
      * 2. Entity::mappedBy() оголошений final — PHPUnit його не підміняє. Тому
      *    ланцюжок фільтрується по тому, що реально можна замокати: final,
